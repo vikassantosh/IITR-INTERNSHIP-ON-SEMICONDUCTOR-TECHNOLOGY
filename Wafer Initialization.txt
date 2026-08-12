@@ -1,0 +1,29 @@
+### Wafer Initialisation
+
+## X- Co-ordinates#####################################
+line x location= 0.0     spacing= 5.0<nm> tag= bottom
+line x location= 0.5<um> spacing= 50.0<nm>
+line x location= 5.0<um> spacing= 0.5<um> tag= top
+
+## Y- Co-ordinates#####################################
+line y location= 0.0     spacing= 0.1<um> tag= left
+line y location= 0.5<um> spacing= 0.1<um> tag= right
+
+#### user can change region e.g Germanium, GaN etc  
+#### Intial doping is also mentioned
+
+
+
+region Silicon xlo= bottom xhi= top ylo= left yhi= right
+init   concentration= 1.4e+15<cm-3> field= Boron !DelayFullD
+
+#### Generated structure in tdr file###################
+
+
+struct tdr = n@node@ !Gas
+
+
+
+
+
+exit

@@ -1,0 +1,43 @@
+### Wafer Initialisation
+
+## X- Co-ordinates#####################################
+line x location= 0.0     spacing= 5.0<nm> tag= bottom
+line x location= 0.5<um> spacing= 50.0<nm>
+line x location= 5.0<um> spacing= 0.5<um> tag= top
+
+## Y- Co-ordinates#####################################
+line y location= 0.0     spacing= 0.1<um> tag= left
+line y location= 0.5<um> spacing= 0.1<um> tag= right
+
+#### user can change region e.g Germanium, GaAs etc  
+#### Intial doping is also mentioned
+
+region Silicon xlo= bottom xhi= top ylo= left yhi= right
+init   concentration= 1.4e+15<cm-3> field= Boron !DelayFullD
+
+
+
+
+
+# Depositing screening oxide
+# --------------------------
+# rate(0.01um/min)*1min =0.01um  or 10 nm 
+
+#deposit material= {Oxide} type= isotropic time= 1.0 rate= {0.01}
+
+
+set thick_ness [list 25 50 75 100]
+
+foreach  thick_list $thick_ness {
+deposit Oxide type= isotropic thickness= $thick_list<nm>
+puts "The thickness list $thick_list"
+
+struct tdr = n@node@_$thick_list !Gas
+}
+
+## deposit Oxide type= isotropic thickness= $<nm>
+
+#struct tdr = n@node@ !Gas
+
+
+exit

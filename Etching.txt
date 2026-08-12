@@ -1,0 +1,85 @@
+
+
+### Wafer Initialisation
+
+## X- Co-ordinates#####################################
+line x location= 0.0     spacing= 5.0<nm> tag= bottom
+line x location= 0.5<um> spacing= 50.0<nm>
+line x location= 5.0<um> spacing= 0.5<um> tag= top
+
+## Y- Co-ordinates#####################################
+line y location= 0.0     spacing= 0.1<um> tag= left
+line y location= 0.5<um> spacing= 0.1<um> tag= right
+
+#### user can change region e.g Germanium, GaN etc  
+#### Intial doping is also mentioned
+region Silicon xlo= bottom xhi= top ylo= left yhi= right
+init   concentration= 1.4e+15<cm-3> field= Boron !DelayFullD
+
+struct tdr = n@node@_wafer
+gas_flow name=O2_1_N2_1 pressure=1<atm> flowO2=1.2<l/min> flowN2=1.0<l/min>
+diffuse temperature=900<C> time=40<min> gas_flow=O2_1_N2_1
+
+struct tdr = n@node@_wafer_Oxide
+###### Implantation Process###########################
+## User can change energy, dose & tilt
+implant Arsenic energy= 30<keV> dose= 1e14<cm-2> tilt= 7<degree>  rotation= 0<degree> 
+
+struct tdr = n@node@_wafer_Oxide_Implant
+## Impurity Activation (Annealing)####################
+diffuse  temperature= 1000<C> time= 30<min>
+struct tdr = n@node@_wafer_Oxide_Implant_annealed
+strip Oxide
+
+struct tdr = n@node@_W_O_I_A_OStrip
+set pr "negative"
+
+
+if {$pr == "Positive" } {
+deposit Oxide type= isotropic thickness= 50.0<nm>
+######### Photolithography#########################
+
+##Transparent mask plate chrome area
+## Trans Area - Opaque Area
+## -1     0.25-===============
+## ------------===============
+## ------------===============
+## ------------===============
+## ------------===============
+## Soft Area---===Hard Area=== 
+
+mask  name= M1_Usr segments= {-1.0 0.25} positive
+photo mask= M1_Usr thickness= 0.5
+
+struct tdr = n@node@_step_positive_1 !Gas
+
+etch Oxide anisotropic thickness= 60<nm>
+struct tdr = n@node@_step_positive_2 !Gas
+
+
+strip photoresist
+
+struct tdr = n@node@_step_positive_3 !Gas
+
+} else {
+deposit Oxide type= isotropic thickness= 50.0<nm>
+######### Photolithography#########################
+
+mask  name= M2_Usr segments= {-1.0 0.25} negative
+photo mask= M2_Usr thickness= 0.5
+
+struct tdr = n@node@_step_negative_1 !Gas
+
+etch Oxide anisotropic thickness= 60<nm>
+
+struct tdr = n@node@_step_negative_2 !Gas
+
+
+strip photoresist
+
+struct tdr = n@node@_step_negative_3 !Gas
+
+}
+
+## struct tdr = n@node@
+exit
