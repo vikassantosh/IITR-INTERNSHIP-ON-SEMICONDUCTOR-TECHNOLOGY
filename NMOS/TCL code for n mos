@@ -1,0 +1,182 @@
+line x location= 0.0      spacing= 1.0<nm>  tag= SiTop                            
+line x location= @depth@<um> spacing= 1.0<um>  tag= SiBottom   
+
+line y location= 0.0      spacing= 250<nm>  tag= left               
+line y location= @length@<um> spacing= 250<nm>  tag= Right 
+
+#------mesh definition----------
+
+region Silicon xlo= SiTop xhi= SiBottom ylo= left yhi= Right
+init concentration= 1e15<cm-3> field= Phosphorus !DelayFullD
+
+
+
+#------wafer initialization--------
+
+gas_flow clear
+gas_flow name= flow1 pressure= 1.0<atm> flowO2= 0.1<l/min> flowN2= 10.0<l/min> 
+gas_flow name= flow2           pressure= 1.0<atm> flowO2= 1.0<l/min>
+temp_ramp name= PadOxide clear
+temp_ramp name= PadOxide time= (1050.0-700.0)/75<s> temperature= 700.0<C> ramprate= 75<K/s>  gas.flow= flow1
+temp_ramp name= PadOxide time= 1.5<min> temperature= 1050.0<C>   gas.flow= flow2
+temp_ramp name= PadOxide time= (1050.0-700.0)/20<s> temperature= 1050.0<C> ramprate= -20<K/s> gas.flow= flow1
+diffuse temp.ramp= PadOxide
+
+#diffuse temperature = 1000 time = 1<min> O2
+
+
+
+#------------pad oxide--------------
+
+deposit Nitride isotropic thickness= 0.2
+
+#------------nitride formation-------
+
+set TrenchLeftCoord   0.125 
+set TrenchRightCoord  1.375
+
+mask name= STI  segments= { 0 $TrenchLeftCoord $TrenchRightCoord 1.5} 
+
+photo mask= STI thickness= 0.5
+
+
+
+etch Nitride anisotropic thickness= 0.2*1.5 
+
+
+etch Oxide anisotropic thickness= 0.2*1.5
+strip      Photoresist
+
+
+
+
+
+set TrenchAngle 88.0 
+set TrenchDepth 3.5
+
+etch Silicon type= trapezoidal thickness= $TrenchDepth angle= $TrenchAngle 
+
+
+
+gas_flow clear
+gas_flow name= H2O  pressure= 1.0<atm> flowH2O= 1.0<l/min>
+temp_ramp name= Liner_Oxide clear
+temp_ramp name= Liner_Oxide time= 0.25<min> temperature= 1050.0<C> gas.flow= H2O
+diffuse temp.ramp= Liner_Oxide
+
+
+
+deposit Oxide isotropic thickness= 4.5
+
+
+
+etch material= all  type= cmp  coord= 0.0065
+
+
+deposit Oxide isotropic thickness= 0.01
+
+##implant  Boron  dose= 2.0e13<cm-2>  energy= 180<keV> tilt= 7 rotation= 0  
+implant  Boron  dose= 1.0e13<cm-2>  energy= 50<keV> tilt= 7 rotation= 0  
+implant  Boron  dose= 5.0e12<cm-2>  energy= 20<keV> tilt= 7 rotation= 0  
+
+etch material= all  type= cmp  coord= 0.0065
+
+diffuse temperature= 1050<C> time= 10.0<s>   
+
+
+
+
+deposit Oxide isotropic thickness= 10<nm>
+
+set n_LeftCoord   0.9 
+set n_RightCoord  1.3
+
+mask name= n_rgr  segments= {$n_LeftCoord $n_RightCoord } 
+photo mask= n_rgr  thickness= 0.4
+
+implant  Arsenic  dose= 2.0e13<cm-2>  energy= 50<keV> tilt= 7 rotation= 0 
+diffuse temperature= 1000<C> time= 5.0<s> 
+strip photoresist 
+
+set p_LeftCoord   0.3 
+set p_RightCoord  .35
+
+mask name= p_poc_rgr  segments= {$p_LeftCoord $p_RightCoord } 
+photo mask= p_poc_rgr thickness= 0.4
+
+implant  Boron  dose= 5.0e13<cm-2>  energy= 5<keV> tilt= 7 rotation= 0
+
+#####RTA-----------------
+diffuse temperature= 950<C> time= 2.0<s> 
+
+
+etch material= Oxide type = anisotropic thickness= 0.05
+strip photoresist 
+
+mask name= n_cnt  segments= {1 1.2 } 
+photo mask= n_cnt thickness= 0.4
+
+
+
+
+etch material= Oxide type = anisotropic thickness= 0.05
+strip photoresist 
+
+deposit Aluminium isotropic thickness= 75<nm>
+
+
+
+mask  name= Cnt_Al segments = {0.28 0.37 0.88 1.32} negative
+photo mask= Cnt_Al thickness= 40<nm>
+
+
+
+etch material= Aluminium type= anisotropic thickness=80<nm>  
+
+strip photoresist
+
+deposit Nitride isotropic thickness= 40<nm>
+
+
+
+set p_LeftCoord   0.3 
+set p_RightCoord  .35
+
+set n_LeftCoord   0.9 
+set n_RightCoord  1.3
+
+
+
+mask name= mask3 segments= {$p_LeftCoord $p_RightCoord $n_LeftCoord $n_RightCoord} 
+photo mask= mask3 thickness= 0.3
+
+etch  material= Nitride type= anisotropic thickness= 40<nm>
+
+
+strip photoresist
+
+## Contact placement
+contact name= "anode" box Aluminium  xlo= -0.08 xhi= 0.01 ylo= 0.26 yhi= 0.38
+contact name= "cathode" box Aluminium  xlo= -0.08 xhi= 0.01 ylo= 0.85 yhi= 1.35
+
+
+line      clear
+refinebox clear
+
+
+refinebox name= Global    min= {0 0} max= {6 1.5} xrefine= 0.2 yrefine= 0.5
+
+refinebox name= PN min= {0 0} max= {1 1.5} xrefine= 0.02 yrefine= 0.02
+ 
+refinebox interface.mat.pairs= {Silicon Aluminium }    
+
+
+grid remesh 
+
+
+
+struct tdr = n@node@ 
+
+
+
+
