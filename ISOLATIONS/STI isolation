@@ -1,0 +1,60 @@
+line x location= 0.0     spacing= 5.0<nm> tag= bottom
+line x location= 0.5<um> spacing= 50.0<nm>
+line x location= 5.0<um> spacing= 0.5<um> tag= top
+
+line y location= 0.0     spacing= 0.1<um> tag= left
+line y location= 0.5<um> spacing= 0.1<um> tag= right
+
+region Silicon xlo= bottom xhi= top ylo= left yhi= right
+init   concentration= 1.4e+15<cm-3> field= Boron !DelayFullD
+
+
+
+
+gas_flow clear
+
+diffuse temperature = 1000 time = 2<min> O2
+
+struct tdr = n@node@_1
+
+deposit Nitride isotropic thickness=0.1
+
+struct tdr = n@node@_2
+
+mask name = usr left = 0.2 right = 0.3
+
+photo mask = usr thickness = 0.1
+
+struct tdr = n@node@_3
+
+etch material = {Nitride Oxide} thickness = 0.15 type = anisotropic
+
+strip photoresist
+
+struct tdr = n@node@_4
+
+etch Silicon type = trapezoidal thickness = 0.2  angle= 85
+
+struct tdr = n@node@_5
+
+etch material = Oxide thickness = 0.02 type = isotropic
+
+struct tdr = n@node@_6
+
+diffuse temperature = 1000 time = 19<min> O2
+
+struct tdr = n@node@_7
+
+
+deposit oxide thickness = 0.2 type = isotropic
+
+struct tdr = n@node@_8
+
+etch material = all  type = cmp coord = -0.1
+
+
+struct tdr = n@node@_9
+
+strip Nitride
+
+struct tdr = n@node@_10
